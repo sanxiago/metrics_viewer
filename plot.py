@@ -8,18 +8,19 @@ import re
 filename = str(sys.argv[1])
 df = pd.read_csv(filename)
 
-name = filename.replace(".csv","")
 
 # convert time into date
 df['time'] = pd.to_datetime(df['time'], unit='ms')
 
 
-
 separate_charts = False
 interactive_charts = True
 save_charts = True
+name = filename.replace(".csv","")
+output_dir = "charts/"
 
-field_filter = ':(EventType|RateUnit)$'
+# Regex fields to drop
+field_filter = '(EventType|RateUnit|KafkaRequestHandlerPool|AvgIdlePercent.Count|MeanRate)$'
 
 # Convert Count to deltas:
 for metric in df.columns.values:
@@ -37,7 +38,7 @@ plt.rc('legend', fontsize=6)
 for metric in df.columns.values:
     if metric == 'time':
         x = df['time']
-        plt.figure(filename).set_figwidth(16)
+        plt.figure(filename).set_figwidth(14)
         next
     else:
         y = df[metric]
@@ -49,7 +50,7 @@ for metric in df.columns.values:
 plt.gcf().autofmt_xdate()
 
 if save_charts:
-   plt.savefig(name+".png")
+   plt.savefig(output_dir+name+".png")
 
 
 if interactive_charts:
